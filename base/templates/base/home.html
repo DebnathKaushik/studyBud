@@ -1,0 +1,21 @@
+{%extends 'main.html'%}
+
+{%block content%}
+<h1>Home Tamplate</h1>
+
+<div>
+    <div>
+
+        {% for i in key_room %}                  <!-- "key_room" is context name -->
+
+        <div>
+        <h3> <a href="{% url 'room' i.id %}">{{i.id}}</a>  -----  <a href="{% url 'room' i.id %}">{{i.name}}</h3> </a>   <!--'room' is in urls path name -->
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{%endblock content%}
