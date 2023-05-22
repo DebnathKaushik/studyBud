@@ -1,16 +1,26 @@
 {%extends 'main.html'%}
 
 {%block content%}
-<h1>Home Tamplate</h1>
+<h1>Home Templete</h1>
+
 
 <div>
     <div>
 
-        {% for i in key_room %}                  <!-- "key_room" is context name -->
+        <a href="{%url 'create-room'%}">Create Room</a><hr>
+
+        {% for i in roomm %}
+
+        <h4><a href="{% url 'update-room' i.id %}">EDIT</a></h4>
+        
+        <h3><span>@{{i.host.username}}</span></h3>
 
         <div>
-        <h3> <a href="{% url 'room' i.id %}">{{i.id}}</a>  -----  <a href="{% url 'room' i.id %}">{{i.name}}</h3> </a>   <!--'room' is in urls path name -->
+        <h3> {{i.id}} ---- <a href="{% url 'room' i.id %}">{{i.name}}</h3> </a>  
         </div>
+
+        <h4>Topic Name : {{i.topic.name}}</h4>
+        <hr>
 
         {% endfor %}
 
