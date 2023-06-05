@@ -1,30 +1,64 @@
 {%extends 'main.html'%}
 
 {%block content%}
-<h1>Home Templete</h1>
 
 
-<div>
-    <div>
 
-        <a href="{%url 'create-room'%}">Create Room</a><hr>
-
-        {% for i in roomm %}
-
-        <h4><a href="{% url 'update-room' i.id %}">EDIT</a></h4>
+<style>
+    .home-container{
+        display: grid;
+        grid-template-columns:  1fr 3fr;
+    
         
-        <h3><span>@{{i.host.username}}</span></h3>
+    }
+</style>
+
+
+
+<div class="home-container">
+
+    <div>
+        <h3>Browes Topics</h3>
+        <hr>
+    
+        <div>
+            <a href="{% url 'home' %}">All</a>
+        </div> 
+        
+
+        {% for i in topicc %}
+            <div>
+               <a href="{% url 'home' %}?q={{i.namee}}">{{i.namee}}</a>
+            </div>
+        {% endfor %}
+        
+    </div>
+
+
+    <div>
+        <h5> {{room_count}} Rooms available </h5>
+
+        <a href="{%url 'create-room'%}">Create Room</a>
 
         <div>
-        <h3> {{i.id}} ---- <a href="{% url 'room' i.id %}">{{i.name}}</h3> </a>  
-        </div>
+        {% for i in roomm %}
 
-        <h4>Topic Name : {{i.topic.name}}</h4>
-        <hr>
+            <div>  
+                <a href="{% url 'update-room' i.id %}">EDIT</a> &nbsp 
+                <a href="{% url 'delete-room' i.id %}">Delete</a>
+                <span>@{{i.host.username}}</span>
+                <h3> {{i.id}} -- <a href="{% url 'room' i.id %}">{{i.name}}</h3> </a>  
+                <h4>{{i.topic.namee}}</h4>
+                <hr>
+            </div> 
 
         {% endfor %}
 
+        </div>
+
+       
     </div>
+
 
 </div>
 
