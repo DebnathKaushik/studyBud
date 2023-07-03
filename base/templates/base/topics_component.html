@@ -1,0 +1,12 @@
+<h3>Browes Topics</h3>
+<hr>
+<div>
+    <a href="{% url 'home' %}">All</a>
+</div> 
+    
+
+{% for i in topicc %}
+<div>
+    <a href="{% url 'home' %}?q={{i.namee}}">{{i.namee}}</a>
+</div>
+{% endfor %}

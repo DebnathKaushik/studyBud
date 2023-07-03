@@ -1,5 +1,5 @@
 from django.shortcuts import render ,redirect
-from .models import Room,Topic
+from .models import Room,Topic,Meassage
 from .forms import RoomForm
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -86,10 +86,9 @@ def home(request):
     
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
-
     roomlist = Room.objects.filter(
     Q(topic__namee__icontains=q) |
-    Q(name__icontains=q) |
+    Q(name__icontains=q) |         # from this Query for search room box (GET perameter/q)
     Q(description__icontains=q)|
     Q(host__username__icontains=q)
     )
@@ -108,12 +107,7 @@ def home(request):
             # Topic was successfully created
             # Handle the case when a new topic is created
             
-                pass
-            except Topic.MultipleObjectsReturned:
-            # Multiple topics with the same name exist, handle the case accordingly
-            
-                 pass
-    
+           
     # This is for Topic Deleted
     if request.method == 'POST':
         delete_topic = request.POST.get("delete_topic")
@@ -123,28 +117,47 @@ def home(request):
                 topic.delete()
             except Topic.DoesNotExist:
                 return HttpResponse("Topic not found")
-        
-
-    
-
-
-        
+             
     topics = Topic.objects.all()
     room_count = roomlist.count()
+    room_messages = Meassage.objects.filter(
+         Q(room__topic__namee__icontains=q)
+        )
     
-    context = {'roomm':roomlist , 'topicc':topics ,"room_count":room_count }
+    context = {'roomm':roomlist , 'topicc':topics ,"room_count":room_count,'room_messages':room_messages}
     return render(request, 'base/home.html',context)
 
-#Room
+#Go to Room
 def room(request , pk ):
-    var = Room.objects.get(id=pk)        
-    context = {'var': var}
+    var_room = Room.objects.get(id=pk)
+    room_messages = var_room.meassage_set.all()# This is manager for foreign key(meassage_set)
+    room_participants = var_room.participants.all()
+
+    if request.method == "POST":
+        room_messages = Meassage.objects.create(user = request.user,
+            room = var_room,
+            body = request.POST.get('body'))
+        var_room.participants.add(request.user)#participants it just Room Model attribute(related manager)
+        return redirect ('room', pk=var_room.id)
+    
+
+    context = {'var_room': var_room, 'room_messages':room_messages,'room_participants':room_participants}
     return render(request, 'base/room.html',context)
    
 
+#This is for User Profile
+def userProfile(request,pk):
+    user = User.objects.get(id=pk)
+    roomlist = user.room_set.all()
+    room_messages = user.meassage_set.all()
+    topics = Topic.objects.all()
+    context = {'user':user,'roomm':roomlist,'room_messages':room_messages,'topicc':topics}
+    return render (request,'base/profile.html',context)
+
+
 #This is for create Room
 @my_decorator
-def createRoom(request):                                  #CURD operation(Create)
+def createRoom(request):                  #CURD operation(Create)
     form = RoomForm()
     if request.method == 'POST':
         form = RoomForm(request.POST)
@@ -188,3 +201,36 @@ def deleteRoom(request , pk):
         return redirect('home')
     
     return render (request , 'base/delete.html',{'obj' : room})
+
+
+#This is delete for Room_Message 
+@my_decorator
+def deleteMessage(request , pk):
+    message = Meassage.objects.get(id = pk)
+
+    if request.user != message.user:
+        return HttpResponse("You are not allowed here")
+
+    if request.method == 'POST':
+        message.delete()
+        return redirect('home')
+    
+    return render (request , 'base/delete.html',{'obj' : message})
+
+
+# this is for when message delete in room and back to same room/And (after complete next task -> recent activity message delete will be upper one.)
+# change will be (url,home templte{delete link},viwes name)
+# @my_decorator
+# def deleteMessage(request , pk):
+#     message = Meassage.objects.get(id = pk)
+
+#     if request.user != message.user:
+#         return HttpResponse("You are not allowed here")
+
+#     if request.method == 'POST':
+#         room_id = message.room.id
+#         message.delete()
+#         return redirect('room',pk=room_id)
+    
+#     return render (request , 'base/delete.html',{'obj' : message})
+

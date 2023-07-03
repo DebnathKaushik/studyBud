@@ -1,0 +1,19 @@
+<div>
+{% for i in roomm %}
+
+    <div>
+        <!-- If i need that when user not login but show edit 
+        and delete link then i have to apply condition on it {1st:if/2nd:elif}-->
+        {% if request.user == i.host %} 
+        <a href="{% url 'update-room' i.id %}">EDIT</a> &nbsp 
+        <a href="{% url 'delete-room' i.id %}">Delete</a>
+        {% endif %}
+        
+        <a href="{% url 'user-profile' i.host.id %}">@{{i.host.username}}</a>
+        <h3> {{i.id}} -- <a href="{% url 'room' i.id %}">{{i.name}}</h3> </a>  
+        <h4>{{i.topic.namee}}</h4>
+        <hr>
+    </div> 
+
+{% endfor %}
+</div>
