@@ -70,7 +70,7 @@ def RegisterPage(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.username.lower() # this username is usercreatioform model field
+            user.username = user.username.lower() # this username is usercreatioform model/class field
             user.save()
             login(request,user)
             return redirect('home')
@@ -94,29 +94,29 @@ def home(request):
     )
 
     # For Add Topic
-    if request.method == 'POST': 
-        new_topic = request.POST.get('topic_name')
-        if new_topic:
-            try:
-                Topic.objects.get(namee=new_topic)
-            # Topic already exists, handle the case accordingly
-            # For example, you can display an error message or take a different action
-                pass
-            except Topic.DoesNotExist:
-                Topic.objects.create(namee=new_topic)
-            # Topic was successfully created
-            # Handle the case when a new topic is created
+    # if request.method == 'POST': 
+    #     new_topic = request.POST.get('topic_name')
+    #     if new_topic:
+    #         try:
+    #             Topic.objects.get(namee=new_topic)
+    #         # Topic already exists, handle the case accordingly
+    #         # For example, you can display an error message or take a different action
+    #             pass
+    #         except Topic.DoesNotExist:
+    #             Topic.objects.create(namee=new_topic)
+    #         # Topic was successfully created
+    #         # Handle the case when a new topic is created
             
            
-    # This is for Topic Deleted
-    if request.method == 'POST':
-        delete_topic = request.POST.get("delete_topic")
-        if delete_topic:
-            try:
-                topic = Topic.objects.get(namee=delete_topic)
-                topic.delete()
-            except Topic.DoesNotExist:
-                return HttpResponse("Topic not found")
+    # # For Delete Topic 
+    # if request.method == 'POST':
+    #     delete_topic = request.POST.get("delete_topic")
+    #     if delete_topic:
+    #         try:
+    #             topic = Topic.objects.get(namee=delete_topic)
+    #             topic.delete()
+    #         except Topic.DoesNotExist:
+    #             return HttpResponse("Topic not found")
              
     topics = Topic.objects.all()
     room_count = roomlist.count()
@@ -130,7 +130,7 @@ def home(request):
 #Go to Room
 def room(request , pk ):
     var_room = Room.objects.get(id=pk)
-    room_messages = var_room.meassage_set.all()# This is manager for foreign key(meassage_set)
+    room_messages = var_room.meassage_set.all()# This is related manager for foreign key(meassage_set)
     room_participants = var_room.participants.all()
 
     if request.method == "POST":
@@ -146,7 +146,7 @@ def room(request , pk ):
    
 
 #This is for User Profile
-def userProfile(request,pk):
+def userProfile(request, pk):
     user = User.objects.get(id=pk)
     roomlist = user.room_set.all()
     room_messages = user.meassage_set.all()
@@ -157,12 +157,15 @@ def userProfile(request,pk):
 
 #This is for create Room
 @my_decorator
-def createRoom(request):                  #CURD operation(Create)
+def createRoom(request):                 
     form = RoomForm()
+
     if request.method == 'POST':
         form = RoomForm(request.POST)
         if form.is_valid():
-            form.save()
+            room_obj = form.save(commit=False)
+            room_obj.host = request.user
+            room_obj.save()
             return redirect('home')
 
     context = {'form':form}
@@ -171,7 +174,7 @@ def createRoom(request):                  #CURD operation(Create)
 
 #This is for update Room
 @my_decorator
-def updateRoom(request , pk):                              # update
+def updateRoom(request , pk):                              
     room = Room.objects.get(id=pk)
     form = RoomForm(instance = room)
 

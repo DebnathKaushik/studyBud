@@ -23,7 +23,7 @@
             <hr>
             {% for i in room_messages %}
                 <div>
-                    {% if request.user == i.user %}<!--i.user is Message Model (user) attribute-->
+                    {% if request.user == i.user %} <!--i.user is Message Model (user) attribute-->
                     <a href="{% url 'delete-message' i.id %}">Delete Message</a>
                     {% endif %}
                     <small>@{{i.user}} {{i.created|timesince}} ago</small>
