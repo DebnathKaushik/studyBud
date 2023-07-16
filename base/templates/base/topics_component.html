@@ -9,7 +9,7 @@
 
       {% for i in topicc %}
       <li>
-        <a href="{% url 'home' %}?q={{i.namee}}">{{i.namee}} <span>{{i.room_set.all.count}}</span></a> <!--(room_set) is django default related manager-->
+        <a href="{% url 'home' %}?q={{i.namee}}">{{i.namee}} <span>{{i.room_set.all.count}}</span></a> <!--(room_set) is django default related manager / here (i) is topic class object-->
       </li>
       {% endfor %}
 
