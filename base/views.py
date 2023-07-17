@@ -1,6 +1,6 @@
 from django.shortcuts import render ,redirect
 from .models import Room,Topic,Meassage
-from .forms import RoomForm
+from .forms import RoomForm , UserForm
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -130,7 +130,7 @@ def home(request):
 #Go to Room
 def room(request , pk ):
     var_room = Room.objects.get(id=pk)
-    room_messages = var_room.meassage_set.all()# This is related manager for foreign key(meassage_set)
+    room_messages = var_room.meassage_set.all()# This is related manager for foreign key(meassage_set) for reverse relationship 
     room_participants = var_room.participants.all()
 
     if request.method == "POST":
@@ -150,8 +150,8 @@ def room(request , pk ):
 #This is for User Profile
 def userProfile(request, pk):
     user = User.objects.get(id=pk)
-    roomlist = user.room_set.all()
-    room_messages = user.meassage_set.all()
+    roomlist = user.room_set.all()# This is related manager for foreign key(meassage_set) for reverse relationship 
+    room_messages = user.meassage_set.all()# This is related manager for foreign key(meassage_set) for reverse relationship 
     topics = Topic.objects.all()
     context = {'user':user,'roomm':roomlist,'room_messages':room_messages,'topicc':topics}
     return render (request,'base/profile.html',context)
@@ -166,9 +166,9 @@ def createRoom(request):
     if request.method == 'POST':
         form = RoomForm(request.POST)
         topic_name = request.POST.get('TOPIC')
-        TOPIC,created = Topic.objects.get_or_create(namee = topic_name)
+        TOPIC,created = Topic.objects.get_or_create(namee = topic_name) # old topic stay(not change) OR New topic create .
 
-        Room.objects.create(
+        Room.objects.create(        # Room create bcoz there are no room before 
             host = request.user,
             topic = TOPIC,
             name = request.POST.get('name'),
@@ -231,6 +231,49 @@ def deleteMessage(request , pk):
         return redirect('home')
     
     return render (request , 'base/delete.html',{'obj' : message})
+
+
+
+
+
+#This is for User-Profile update
+# @my_decorator
+# def UpdateUser(request):
+#     USER = request.user
+#     form = UserForm(instance=USER)# here (USER) is object and it has two specify field in forms.py 
+
+#     if request.method == 'POST':
+#         form = UserForm(request.POST , instance=USER)
+#         if form.is_valid:
+#             form.save()
+#             return redirect ('user-profile', pk= USER.id)
+
+
+#     return render(request, 'base/update_user.html', {'form':form})
+
+
+
+                                      # there is two way for update (one is above and one is this one) .
+
+
+#This is for User-Profile update
+@my_decorator
+def UpdateUser(request):                      
+    USER = request.user                     
+    form = UserForm(instance = USER)# here (USER) is object and it has two specify field in forms.py 
+
+    if request.method == "POST":
+        USER.username = request.POST.get('username') # username is User Model attribute
+        USER.email = request.POST.get('email') # email is User Model attribute
+        USER.save()
+        return redirect('user-profile', pk=USER.id)
+    
+    return render (request , 'base/update_user.html',{'form':form})
+    
+
+
+
+
 
 
 # this is for when message delete in room and back to same room/And (after complete next task -> recent activity message delete will be upper one.)
