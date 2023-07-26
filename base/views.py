@@ -70,7 +70,7 @@ def RegisterPage(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.username.lower() # this username is usercreatioform model/class field
+            user.username = user.username.lower() # this username is usercreatioform model/class attribute
             user.save()
             login(request,user)
             return redirect('home')
@@ -118,7 +118,7 @@ def home(request):
     #         except Topic.DoesNotExist:
     #             return HttpResponse("Topic not found")
              
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
     room_count = roomlist.count()
     room_messages = Meassage.objects.filter(
          Q(room__topic__namee__icontains=q)
@@ -256,7 +256,7 @@ def deleteMessage(request , pk):
                                       # there is two way for update (one is above and one is this one) .
 
 
-#This is for User-Profile update
+#This is for User-Profile update/Edit
 @my_decorator
 def UpdateUser(request):                      
     USER = request.user                     
@@ -272,7 +272,17 @@ def UpdateUser(request):
     
 
 
+# This is for mobile responsive/Browse topic
+def topicsPage(request): 
+    q = request.GET.get('q') if request.GET.get('q') != None else '' 
+    topics = Topic.objects.filter(namee__icontains=q)
+    return render(request , 'base/topics.html' , {'topics':topics})
 
+
+# This is for mobile responsive/Recent activities
+def activityPage(request):
+    room_messages = Meassage.objects.all()
+    return render (request , 'base/activity.html' ,{'room_messages':room_messages})
 
 
 

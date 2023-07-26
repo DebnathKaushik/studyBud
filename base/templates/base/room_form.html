@@ -26,7 +26,7 @@
 
             <div class="form__group">
               <label for="room_topic">Enter a Topic </label>
-              <input required type="text" value="{{room.topic.namee}}" name="TOPIC" list="topic-list"/> <!--value means show topic name in textbox -->
+              <input required type="text" value="{{room.topic.namee}}" name="TOPIC" list="topic-list"/> <!--"value" means show topic name in textbox(for update) -->
               <datalist id="topic-list">
                 <select id="room_topic">
                   {% for i in topicc %}
@@ -38,12 +38,12 @@
 
 
             <div class="form__group">
-              <label for="room_name">Room Name</label>
+              <label for="room_name">Enter Room Name</label>
               {{form.name}}
             </div>
 
             <div class="form__group">
-              <label for="room_description">Room Description</label>
+              <label for="room_description">Enter Room Description</label>
               {{form.description}}
             </div>
 

@@ -19,6 +19,7 @@
                 <label for="room_name">Username</label>
                 <input id="username" name="username" type="text" placeholder="Enter Username" />
               </div>
+
               <div class="form__group">
                 <label for="password">Password</label>
                 <input
@@ -73,10 +74,10 @@
             <form class="form" action="" method="POST">
               {% csrf_token %}
 
-              {% for i in form %}
+              {% for field in form %}
               <div class="form__group form__group">
-                <label for="room_name">{{i.label}}</label>
-              {{i}}
+                <label for="room_name">{{field.label}}</label>
+              {{field}}
               </div>
               {% endfor %}
 
