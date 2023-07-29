@@ -16,7 +16,7 @@ def getRoutes(request):
 @api_view(['GET'])
 def getRooms(request):
     rooms = Room.objects.all()
-    serializer = RoomSerializers(rooms ,many=True)
+    serializer = RoomSerializers(rooms ,many=True) # Here serializer turn into json list from python list or complex objects
     return Response(serializer.data)
 
 
