@@ -1,11 +1,9 @@
 from django.shortcuts import render ,redirect
-from .models import Room,Topic,Meassage
-from .forms import RoomForm , UserForm
+from .models import Room,Topic,Meassage,User
+from .forms import RoomForm , UserForm,My_user_creation_register_form
 from django.db.models import Q
-from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
-from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 
 # roomlist = [
@@ -31,15 +29,15 @@ def my_decorator(func):
 def LoginPage(request):
     page = 'login'
     if request.method == 'POST':
-        var_username = request.POST.get('username').lower()   
+        var_email = request.POST.get('email').lower()   
         var_password = request.POST.get('password')
 
         try:
-            user = User.objects.get(username=var_username) # username is User Model field here 
+            user = User.objects.get(email=var_email) # username is User Model field here 
         except:
             messages.error(request, "User not found")  # if message have then output(main.html)
 
-        user = authenticate(request, username=var_username, password=var_password)
+        user = authenticate(request, email=var_email, password=var_password)
 
         if user is not None:
             login(request,user)
@@ -65,9 +63,9 @@ def LogoutPage(request):
 
 # This is for User registation
 def RegisterPage(request):
-    form = UserCreationForm()
+    form = My_user_creation_register_form()
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = My_user_creation_register_form(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower() # this username is usercreatioform model/class attribute
@@ -236,20 +234,20 @@ def deleteMessage(request , pk):
 
 
 
-#This is for User-Profile update
-# @my_decorator
-# def UpdateUser(request):
-#     USER = request.user
-#     form = UserForm(instance=USER)# here (USER) is object and it has two specify field in forms.py 
+# This is for User-Profile update
+@my_decorator
+def UpdateUser(request):
+    USER = request.user
+    form = UserForm(instance=USER)# here (USER) is object and it has two specify field in forms.py 
 
-#     if request.method == 'POST':
-#         form = UserForm(request.POST , instance=USER)
-#         if form.is_valid:
-#             form.save()
-#             return redirect ('user-profile', pk= USER.id)
+    if request.method == 'POST':
+        form = UserForm(request.POST ,request.FILES, instance=USER)
+        if form.is_valid:
+            form.save()
+            return redirect ('user-profile', pk= USER.id)
 
 
-#     return render(request, 'base/update_user.html', {'form':form})
+    return render(request, 'base/update_user.html', {'form':form})
 
 
 
@@ -257,18 +255,18 @@ def deleteMessage(request , pk):
 
 
 #This is for User-Profile update/Edit
-@my_decorator
-def UpdateUser(request):                      
-    USER = request.user                     
-    form = UserForm(instance = USER)# here (USER) is object and it has two specify field in forms.py 
+# @my_decorator
+# def UpdateUser(request):                      
+#     USER = request.user                     
+#     form = UserForm(instance = USER)# here (USER) is object and it has two specify field in forms.py 
 
-    if request.method == "POST":
-        USER.username = request.POST.get('username') # username is User Model attribute
-        USER.email = request.POST.get('email') # email is User Model attribute
-        USER.save()
-        return redirect('user-profile', pk=USER.id)
+#     if request.method == "POST":
+#         USER.username = request.POST.get('username') # username is User Model attribute
+#         USER.email = request.POST.get('email') # email is User Model attribute
+#         USER.save()
+#         return redirect('user-profile', pk=USER.id)
     
-    return render (request , 'base/update_user.html',{'form':form})
+#     return render (request , 'base/update_user.html',{'form':form})
     
 
 
